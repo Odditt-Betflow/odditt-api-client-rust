@@ -28,16 +28,27 @@ a short-lived Bearer JWT (via `POST /v1/auth/login` or `POST /v1/oauth/login`) a
 refreshes it as needed. Data endpoints also accept the API key directly via
 `X-API-Key`. Call `configuration().await` to get a ready `Configuration`:
 
+Authenticate with an **API key** (X-API-Key on data endpoints; auto-login +
+refresh Bearer for account endpoints):
+
 ```rust
 use odditt_api_client::auth_session::AuthSession;
 use odditt_api_client::apis::account_api;
 
-// Option A — API key (X-API-Key on data endpoints; auto-login + refresh Bearer
-// for account endpoints):
 let session = AuthSession::from_api_key("YOUR_API_KEY");
 
-// Option B — OAuth client credentials (auto-refreshed Bearer everywhere):
-// let session = AuthSession::from_client_credentials("CLIENT_ID", "CLIENT_SECRET");
+let configuration = session.configuration().await?;
+let keys = account_api::v1_account_api_keys_get(&configuration).await?;
+```
+
+Or authenticate with **OAuth client credentials** (auto-refreshed Bearer
+everywhere):
+
+```rust
+use odditt_api_client::auth_session::AuthSession;
+use odditt_api_client::apis::account_api;
+
+let session = AuthSession::from_client_credentials("CLIENT_ID", "CLIENT_SECRET");
 
 let configuration = session.configuration().await?;
 let keys = account_api::v1_account_api_keys_get(&configuration).await?;
