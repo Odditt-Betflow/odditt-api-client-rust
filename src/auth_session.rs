@@ -177,10 +177,14 @@ impl AuthSession {
     async fn refresh(&self, refresh_token: String) -> Result<AuthTokenPair, AuthError> {
         let configuration = self.auth_config();
         let request = AuthRefreshRequest::new(refresh_token);
-        let result = if self.api_key.is_some() {
-            authentication_api::v1_auth_refresh_post(&configuration, request).await
+        let result: Result<AuthTokenPair, AuthError> = if self.api_key.is_some() {
+            authentication_api::v1_auth_refresh_post(&configuration, request)
+                .await
+                .map_err(|e| AuthError(format!("{e:?}")))
         } else {
-            authentication_api::v1_oauth_refresh_post(&configuration, request).await
+            authentication_api::v1_oauth_refresh_post(&configuration, request)
+                .await
+                .map_err(|e| AuthError(format!("{e:?}")))
         };
         match result {
             Ok(pair) => Ok(pair),
