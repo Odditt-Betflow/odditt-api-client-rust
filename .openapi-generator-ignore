@@ -21,3 +21,7 @@
 #docs/*.md
 # Then explicitly reverse the ignore rule for a single file:
 #!docs/README.md
+
+# Hand-written convenience auth layer (see src/auth_session.rs). Preserve on regen.
+# Its `pub mod auth_session;` lives in src/lib.rs.
+src/auth_session.rs

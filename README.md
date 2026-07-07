@@ -20,6 +20,29 @@ Put the package under your project folder in a directory named `odditt-api-clien
 odditt-api-client = { path = "./odditt-api-client" }
 ```
 
+## Authentication
+
+You authenticate with **either** an API key **or** OAuth client credentials — you
+do not supply a Bearer token yourself. `AuthSession` exchanges your credential for
+a short-lived Bearer JWT (via `POST /v1/auth/login` or `POST /v1/oauth/login`) and
+refreshes it as needed. Data endpoints also accept the API key directly via
+`X-API-Key`. Call `configuration().await` to get a ready `Configuration`:
+
+```rust
+use odditt_api_client::auth_session::AuthSession;
+use odditt_api_client::apis::account_api;
+
+// Option A — API key (X-API-Key on data endpoints; auto-login + refresh Bearer
+// for account endpoints):
+let session = AuthSession::from_api_key("YOUR_API_KEY");
+
+// Option B — OAuth client credentials (auto-refreshed Bearer everywhere):
+// let session = AuthSession::from_client_credentials("CLIENT_ID", "CLIENT_SECRET");
+
+let configuration = session.configuration().await?;
+let keys = account_api::v1_account_api_keys_get(&configuration).await?;
+```
+
 ## Documentation for API Endpoints
 
 All URIs are relative to *https://api.odditt.com*
